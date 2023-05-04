@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 func main() {
@@ -31,38 +30,12 @@ func main() {
 			items.GET("", ListItem(db))
 			items.GET("/:id", ginItem.GetItem(db))
 			items.PATCH("/:id", ginItem.UpdateItem(db))
-			items.DELETE("/:id", DeleteItem(db))
+			items.DELETE("/:id", ginItem.DeleteItem(db))
 		}
 	}
 
 	if err := r.Run(":3000"); err != nil {
 		return
-	}
-}
-
-func DeleteItem(db *gorm.DB) func(*gin.Context) {
-	return func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-
-		if err := db.Table(model.TodoItem{}.TableName()).Where("id = ?", id).Updates(map[string]interface{}{
-			"status": "Deleted",
-		}).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-
-		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }
 
