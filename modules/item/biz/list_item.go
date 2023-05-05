@@ -22,7 +22,7 @@ func (biz *listItemBiz) GetListItem(ctx context.Context, filter *model.Filter, p
 	data, err := biz.storage.ListItem(ctx, filter, paging)
 
 	if err != nil {
-		return nil, err
+		return nil, common.ErrCannotListEntity(model.EntityName, err)
 	}
 
 	return data, nil

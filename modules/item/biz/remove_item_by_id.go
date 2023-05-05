@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"TodoApi/common"
 	"TodoApi/modules/item/model"
 	"context"
 )
@@ -22,15 +23,19 @@ func (biz *deleteItemBiz) DeleteItem(ctx context.Context, id int) error {
 	data, err := biz.storage.GetItem(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		return err
+		if err == common.RecordNotFound {
+			return common.ErrCannotGetEntity(model.EntityName, err)
+		}
+
+		return common.ErrCannotDeleteEntity(model.EntityName, err)
 	}
 
 	if data.Status != nil && *data.Status == model.ItemStatusDeleted {
-		return model.ErrItemIsDeleted
+		return common.ErrEntityDeleted(model.EntityName, model.ErrItemIsDeleted)
 	}
 
 	if err := biz.storage.DeleteItem(ctx, map[string]interface{}{"id": id}); err != nil {
-		return err
+		return common.ErrCannotDeleteEntity(model.EntityName, err)
 	}
 
 	return nil

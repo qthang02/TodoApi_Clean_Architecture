@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"TodoApi/common"
 	"TodoApi/modules/item/model"
 	"context"
 	"strings"
@@ -26,7 +27,7 @@ func (biz *insertItemBiz) InsertNewItem(ctx context.Context, data *model.TodoIte
 	}
 
 	if err := biz.store.CreateItem(ctx, data); err != nil {
-		return err
+		return common.ErrCannotCreateEntity(model.EntityName, err)
 	}
 
 	return nil
