@@ -1,6 +1,7 @@
 package main
 
 import (
+	"TodoApi/middleware"
 	ginItem "TodoApi/modules/item/transport/gin"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -18,6 +19,7 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.Use(middleware.Recovery())
 
 	v1 := r.Group("/v1")
 	{
@@ -30,6 +32,13 @@ func main() {
 			items.DELETE("/:id", ginItem.DeleteItem(db))
 		}
 	}
+
+	r.GET("/ping", func(c *gin.Context) {
+		//fmt.Println([]int{}[0])
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 
 	if err := r.Run(":3000"); err != nil {
 		return
